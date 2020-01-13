@@ -1,0 +1,68 @@
+<form novalidate (ngSubmit)="save()" [formGroup]="customerForm">
+  <div>
+    <mat-form-field class="example-chip-list">
+      <mat-chip-list #chipList aria-label="Fruit selection">
+        <mat-chip
+          *ngFor="let fruit of fruits"
+          [selectable]="selectable"
+          [removable]="removable"
+          (removed)="remove(fruit)"
+        >
+          {{ fruit }}
+          <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+        </mat-chip>
+        <input
+          placeholder="New fruit..."
+          #fruitInput
+          [formControl]="fruitCtrl"
+          [matAutocomplete]="auto"
+          [matChipInputFor]="chipList"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          [matChipInputAddOnBlur]="addOnBlur"
+          (matChipInputTokenEnd)="add($event)"
+          [ngClass]="{
+            'is-invalid':
+              (customerForm.get('fruitCtrl').touched ||
+                customerForm.get('fruitCtrl').dirty) &&
+              !customerForm.get('fruitCtrl').valid
+          }"
+        />
+
+        <div class="invalid-feedback">
+          <span *ngIf="customerForm.get('fruitCtrl').errors?.required">
+            Please select any one tag
+          </span>
+        </div>
+      </mat-chip-list>
+
+      <mat-autocomplete
+        #auto="matAutocomplete"
+        (optionSelected)="selected($event)"
+      >
+        <mat-option
+          *ngFor="let fruit of filteredFruits | async"
+          [value]="fruit"
+        >
+          {{ fruit }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+  <br />
+  <div>
+    <button
+      mat-stroked-button
+      style="width:80px"
+      [title]="
+        customerForm.valid
+          ? 'Save your entered data'
+          : 'Disabled until the form data is valid'
+      "
+      [disabled]="!customerForm.valid"
+    >
+      Save
+    </button>
+  </div>
+</form>
+
+Selected Value: {{ customerForm.value | json }}
